@@ -2,10 +2,12 @@
   "expo": {
     "name": "ZonaGuanarteme",
     "slug": "ZonaGuanarteme",
+    "displayName": "Zona Guanarteme",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
     ]
   },
-  "name": "ZonaGuanarteme"
+  "name": "ZonaGuanarteme",
+  "displayName": "Zona Guanarteme"
 }

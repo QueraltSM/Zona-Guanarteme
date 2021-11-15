@@ -32,6 +32,7 @@ allprojects {
             url(new File(["node", "--print", "require.resolve('jsc-android/package.json')"].execute(null, rootDir).text.trim(), "../dist"))
         }
 
+        maven { url "$rootDir/../node_modules/react-native-background-fetch/android/libs" }
         google()
         mavenCentral()
         jcenter()
