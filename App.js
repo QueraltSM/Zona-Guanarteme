@@ -105,6 +105,8 @@ const styles = StyleSheet.create({
   },
   cabildoView: {
     padding: 20,
+    width:"100%",
+    alignContent:"center",
     textAlign: "center",
     position: 'absolute',
     bottom: 0

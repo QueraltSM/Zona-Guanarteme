@@ -8,40 +8,26 @@ import DatePicker from 'react-native-date-picker';
 import { Icon } from 'react-native-elements';
 
 class OffersScreen extends Component { 
+
     WEBVIEW_REF = "offers"
     webView = {
       canGoBack: false,
       ref: null,
     }
-    beginDate = new Date()
-    endDate = new Date()
   
     constructor(props) {
       super(props);
       this.state = {
         url: "https://admin.dicloud.es/zca/ofertas/index.asp",
-        myLoc: false,
         datePicker1: false,
         datePicker2: false,
         showSearch: false,
         action: true,
         keyword: "",
-        beginDate:  { date: new Date(), name: "01/01/"+new Date().getFullYear() },
-        endDate:   { date: new Date(), name: ("0" + (new Date().getDate())).slice(-2)+"/"+("0" + (new Date().getMonth() + 1)).slice(-2)+"/"+new Date().getFullYear() },
         back: this.props.navigation.state.params.back,
       }
-      this.init()
     }
-  
-    async init() {
-      await AsyncStorage.getItem("myLoc").then((value) => {
-        if (value == null) {
-          value = true
-        }
-        this.setState({ myLoc: JSON.parse(value) })
-      })
-    }
-  
+
     componentDidMount(){
       BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     }
@@ -50,9 +36,7 @@ class OffersScreen extends Component {
       if (this.state.url.includes("oferta")) {
         this.props.navigation.push(this.state.back, {back: "Offers"})
       } else {
-        if (this.state.canGoBack) {
-          this.webView.ref.goBack()
-        }
+        if (this.state.canGoBack) this.webView.ref.goBack()
       }
       return true
     }
@@ -68,10 +52,13 @@ class OffersScreen extends Component {
     resetSearch() {
       this.setState({ keyword: ""})
       this.setState({ showSearch: false })
-      this.setState({ beginDate: { date: new Date(), name: "01/01/"+new Date().getFullYear() }})
-      this.setState({ endDate: { date: new Date(), name: ("0" + (new Date().getDate())).slice(-2)+"/"+("0" + (new Date().getMonth() + 1)).slice(-2)+"/"+new Date().getFullYear()} })
+      this.setState({ action: true })
     }
   
+    showSearch = () => {
+      this.setState({ showSearch: !this.state.showSearch })
+    }
+
     goOffers = () => {
       this.setState({url: "https://admin.dicloud.es/zca/ofertas/index.asp" })
     }
@@ -112,47 +99,9 @@ class OffersScreen extends Component {
       return this.state.showSearch && <Text style={styles.navBarHeader}>Buscador de ofertas flash</Text>
     }
 
-    startEndDate = () => {
-      if (this.state.endDate == undefined) {
-        this.setState({endDate: {date: new Date(), name: ("0" + (new Date().getDate())).slice(-2)+"/"+("0" + (new Date().getMonth() + 1)).slice(-2)+"/"+new Date().getFullYear()} })
-      }
-      this.setState({datePicker2: !this.state.datePicker2})
-    }
-  
-    startBeginDate = () => {
-      if (this.state.beginDate == undefined) {
-        this.setState({beginDate: {date: new Date(), name: ("0" + (new Date().getDate())).slice(-2)+"/"+("0" + (new Date().getMonth() + 1)).slice(-2)+"/"+new Date().getFullYear()} })
-      }
-      this.setState({datePicker1: !this.state.datePicker1})
-    }
-
-    setEndDate = (date) => {
-      var selectedDate = new Date(date)
-      this.setState({endDate: {date: selectedDate, name: ("0" + (selectedDate.getDate())).slice(-2)+"/"+("0" + (selectedDate.getMonth() + 1)).slice(-2)+"/"+selectedDate.getFullYear()} })
-    }
-  
-    setBeginDate = (date) => {
-      var selectedDate = new Date(date)
-      this.setState({beginDate: {date: selectedDate, name: ("0" + (selectedDate.getDate())).slice(-2)+"/"+("0" + (selectedDate.getMonth() + 1)).slice(-2)+"/"+selectedDate.getFullYear()} })
-    }
- 
     async search() {
       var action = ""
-      if (this.state.keyword != "") {
-        action += "keyword="+this.state.keyword
-      }
-      if (this.state.beginDate.date != "") {
-        if (action != "") action += "&"
-        action += "datebegin="+this.state.beginDate.name
-      }
-      if (this.state.endDate.date != "") {
-        if (action != "") action += "&"
-        action += "dateend="+this.state.endDate.name
-      }
-      if (!this.state.action) {
-        if (action != "") action += "&"
-        action += "action=listAll"
-      }
+      if (this.state.keyword != "") action += "keyword="+this.state.keyword
       await this.setState({url: "https://admin.dicloud.es/zca/ofertas/index.asp?" + action })
       this.setState({ action: false })
       this.resetSearch()
@@ -177,15 +126,15 @@ class OffersScreen extends Component {
         }}
         onShouldStartLoadWithRequest={(event) => {
             if (!event.url.includes("about:blank") && !event.url.includes("recaptcha")) {
-                if (event.url.includes("drive") || event.url.includes("tel:") || event.url.includes("mailto:") || event.url.includes("maps") || event.url.includes("facebook")) {
-                    Linking.canOpenURL(event.url).then((value) => {
-                      if (value) Linking.openURL(event.url)
-                    })
-                    return false
-                  } else {
-                    this.setState({ url: event.url })  
-                    return true 
-                  }
+              if (event.url.includes("drive") || event.url.includes("tel:") || event.url.includes("mailto:") || event.url.includes("maps") || event.url.includes("facebook")) {
+                Linking.canOpenURL(event.url).then((value) => {
+                  if (value) Linking.openURL(event.url)
+                })
+                return false
+              } else {
+                this.setState({ url: event.url })  
+                return true 
+              }
             }
         }}
         renderLoading={() => 
@@ -206,50 +155,10 @@ class OffersScreen extends Component {
       />
     }
 
-    closePicker(data) {
-      if (data==1) this.setState({datePicker1: false})
-      if (data==2) this.setState({datePicker2: false})
-      this.setState({beginDate: {date: new Date(), name: ("0" + (new Date().getDate())).slice(-2)+"/"+("0" + (new Date().getMonth() + 1)).slice(-2)+"/"+new Date().getFullYear()} })
-      this.setState({endDate: {date: new Date(), name: ("0" + (new Date().getDate())).slice(-2)+"/"+("0" + (new Date().getMonth() + 1)).slice(-2)+"/"+new Date().getFullYear()} })
-    }
-
-    setPicker1() {
-      if (!this.state.datePicker1) {
-        return <TouchableOpacity onPress={() => this.startBeginDate()}>
-        <Text style={{paddingBottom: 10, fontWeight: "bold", fontSize: 17 }}>Desde fecha</Text>
-        <View style={{flexDirection:"row", alignItems:"center"}}>
-        <Icon name='calendar' type='font-awesome' color='black' size={20} style={{alignSelf:"flex-start"}}/>
-        <Text style={styles.textBox}>{this.state.beginDate.name}</Text>
-        </View>
-        </TouchableOpacity>
-      }
-      return <View style={styles.viewPicker}>
-        <DatePicker date = {this.state.beginDate.date} mode="date" textColor='#148F77' placeholder="select date" format="DD-MM-YYYY" onDateChange={(date) => this.setBeginDate(date)}/>
-        <View style={{flexDirection:"row" }}><TouchableOpacity onPress={() => this.closePicker(1)}><Text style={styles.button}><Icon name='times' type='font-awesome' color='#922B21' size={32} /></Text></TouchableOpacity> 
-        <TouchableOpacity onPress={() => this.startBeginDate()}><Text style={styles.button}><Icon name='save' type='font-awesome' color='#1E76B3' size={30} /></Text></TouchableOpacity> 
-        </View></View>
-    }
-
-    setPicker2() {
-      if (!this.state.datePicker2) {
-        return <TouchableOpacity onPress={() => this.startEndDate()}>
-        <Text style={{paddingBottom: 10, fontWeight: "bold", fontSize: 17 }}>Hasta fecha</Text>
-        <View style={{flexDirection:"row", alignItems:"center"}}>
-        <Icon name='calendar' type='font-awesome' color='black' size={20} style={{alignSelf:"flex-start"}}/>
-        <Text style={styles.textBox}>{this.state.endDate.name}</Text>
-        </View>
-        </TouchableOpacity>
-      }
-      return <View style={styles.viewPicker}>
-      <DatePicker style={styles.datePickerStyle} date = {this.state.endDate.date} mode="date" textColor='#148F77' placeholder="select date" format="DD-MM-YYYY" onDateChange={(date) => this.setEndDate(date)}/>
-      <View style={{flexDirection:"row"}}><TouchableOpacity onPress={() =>  this.closePicker(2)}><Text style={styles.button}><Icon name='times' type='font-awesome' color='#922B21' size={32} /></Text></TouchableOpacity> 
-      <TouchableOpacity onPress={() => this.startEndDate()}><Text style={styles.button}><Icon name='save' type='font-awesome' color='#1E76B3' size={30} /></Text></TouchableOpacity> 
-      </View></View>
-    }
-
     setSearchForm() {
       return (<View>
           <View style={{ paddingTop: 30 }}>
+            <Text style={{fontWeight: "bold", fontSize: 17, padding: 10, textAlign:"center" }}>Buscar por palabras claves</Text>
             <TextInput multiline={true} blurOnSubmit={true} style = { styles.wordBox } placeholder="Ej. Disoft, descuento, promoción" onChangeText={(keyword) => this.setState({keyword: keyword})}  value={this.state.keyword}/> 
           </View>
           <View style={{ paddingTop: 30 }}>
@@ -267,14 +176,8 @@ class OffersScreen extends Component {
         </View>
         {this.state.showSearch && (
         <ScrollView style={{backgroundColor:"white"}}><View style={styles.searchBack}>
-          <View style={styles.formBox}>
-            {this.setPicker1()}
-          </View>
-          <View style={styles.formBox}>
-            {this.setPicker2()}
-          </View>
           {this.setSearchForm()}
-          </View>
+        </View>
         </ScrollView>)}
           {this.setWebView()}
           {this.setFootbar()}

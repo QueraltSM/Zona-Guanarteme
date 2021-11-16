@@ -21,7 +21,6 @@ class SOSScreen extends Component {
       super(props); 
       this.state = {
         url: "https://admin.dicloud.es/zca/sos/index.asp",
-        myLoc: false,
         date: "09-10-2020",
         datePicker1: false,
         datePicker2: false,
@@ -32,17 +31,9 @@ class SOSScreen extends Component {
         endDate:   { date: new Date(), name: ("0" + (new Date().getDate())).slice(-2)+"/"+("0" + (new Date().getMonth() + 1)).slice(-2)+"/"+new Date().getFullYear() },
         back: this.props.navigation.state.params.back,
         today: true
-      }
-      this.init()   
+      } 
     }
   
-    async init() {
-      await AsyncStorage.getItem("myLoc").then((value) => {
-        if (value == null) value = true
-        this.setState({ myLoc: JSON.parse(value) })
-      })
-    }
-    
     componentDidMount(){
       BackHandler.addEventListener('hardwareBackPress', this.handleBackButton); 
     }
