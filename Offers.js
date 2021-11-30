@@ -3,8 +3,6 @@ import { StyleSheet, TouchableOpacity, View, Text, Linking, Image, TextInput, Sc
 import { createAppContainer } from 'react-navigation';
 import { WebView } from 'react-native-webview';
 import { BackHandler } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import DatePicker from 'react-native-date-picker';
 import { Icon } from 'react-native-elements';
 
 class OffersScreen extends Component { 

@@ -37,12 +37,16 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>La aplicación requiere usar su cámara para sacar fotos y adjuntar imágenes en los formularios</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>La aplicación requiere usar su ubicación para mostrarle los comercios cercanos a usted</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Necesitamos usar su ubicación</string>
+	<string>La aplicación requiere usar su ubicación para mostrarle los comercios cercanos a usted</string>
 	<key>NSLocationUsageDescription</key>
-	<string>Necesitamos usar su ubicación</string>
+	<string>La aplicación requiere usar su ubicación para mostrarle los comercios cercanos a usted</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Necesitamos usar su ubicación</string>
+	<string>La aplicación requiere usar su ubicación para mostrarle los comercios cercanos a usted</string>
 	<key>UILaunchStoryboardName</key>
 	<string>SplashScreen</string>
 	<key>UIMainStoryboardFile</key>

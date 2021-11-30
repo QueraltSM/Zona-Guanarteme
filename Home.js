@@ -9,6 +9,8 @@ import BackgroundFetch from 'react-native-background-fetch';
 import PushNotification from 'react-native-push-notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Company } from './App';
+import { getTrackingStatus, requestTrackingPermission } from 'react-native-tracking-transparency';
+import NetInfo from "@react-native-community/netinfo";
 
 class HomeScreen extends Component { 
 
@@ -32,9 +34,8 @@ class HomeScreen extends Component {
         companies: [Company],
         noGeo: true,
         centerMap: true,
-        noLoc: false,
         showSearch: false,
-        timer: 0
+        timer: 0,
       }
       this.init()
       this.getCompanies();
@@ -47,9 +48,16 @@ class HomeScreen extends Component {
         this.notifyProximity();
       }, 600000);
     }
-  
+
     async init() {
-      this.setLocation()
+      if (!this.state.centerMap) {
+        var trackingStatus = await getTrackingStatus();
+        if (trackingStatus === 'authorized' || trackingStatus === 'unavailable') {
+        } else if (trackingStatus === 'not-determined') {
+          await requestTrackingPermission();
+          this.setLocation()
+        }
+      } else await this.setLocation()
     }
   
     async saveId(key, value) {
@@ -269,11 +277,10 @@ class HomeScreen extends Component {
   
     errorCallbackEnter = async () => {
       await this.setState({ noGeo: true })
-      this.showAlert("Error", "Debe activar el GPS para acceder a esta función")
+      this.showAlert("Error", "Debe activar el GPS para acceder a mi ubicación")
     }
 
     errorCallback = async (e) => {
-      console.log("errorCallback:"+JSON.stringify(e))
       await this.setState({ noGeo: true })
     }
 
@@ -412,7 +419,7 @@ class HomeScreen extends Component {
 
     setLocationProlog = () => {
       return (<View style={styles.mainView}>
-        <Text style={styles.mainHeaderGPS}>Debe activar el GPS para acceder a esta función</Text>
+        <Text style={styles.mainHeaderGPS}>Debe activar el GPS para acceder a mi ubicación</Text>
         <TouchableOpacity onPress={() => this.checkMyLocation()}>
         <Text style={styles.enterGuanarteme}>ENTRAR</Text>
         </TouchableOpacity>
@@ -427,6 +434,7 @@ class HomeScreen extends Component {
       startInLoadingState={true}
       incognito={true}
       cacheEnabled={true}
+      startInLoadingState={true} 
       javaScriptEnabled={true}
       domStorageEnabled={true}
       setSupportMultipleWindows={false}
@@ -453,17 +461,9 @@ class HomeScreen extends Component {
           <ActivityIndicator color={'white'} size="large" />
       </View>}
       onError={(x) => console.log('Oh no!', x)}
-            renderError={() => {
-                return (
-                    <View style={styles.errorView}>
-                        <Text style={styles.error}>
-                            Sin conexión
-                        </Text>
-                        <Text></Text>
-                      <Text>Compruebe su conexión a Internet</Text>
-                    </View>);
-            }}
-      />
+      renderError={() => {
+        return (<View style={styles.errorView}></View>);
+      }}/>
     }
 
     render() {
@@ -499,10 +499,6 @@ class HomeScreen extends Component {
       flexDirection:'row', 
       textAlignVertical: 'center',
       height: 50
-    },
-    error: {
-      fontSize: 20,
-      marginTop: 50,
     },
     loading: {
       position: 'absolute',
