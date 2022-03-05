@@ -141,14 +141,7 @@ class OffersScreen extends Component {
         </View>}
         onError={(x) => console.log('Oh no!', x)}
         renderError={() => {
-            return (
-                <View style={styles.errorView}>
-                    <Text style={styles.error}>
-                        Algo salió mal...
-                    </Text>
-                    <Text></Text>
-                  <Text>Compruebe su conexión a Internet</Text>
-                </View>);
+          return (<View style={styles.errorView}></View>);
         }}
       />
     }
